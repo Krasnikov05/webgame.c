@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <stdbool.h>
 #include "log.h"
 #include "http.h"
@@ -18,6 +19,7 @@ void print_usage(char *name) {
 }
 
 int main(int argc, char **argv) {
+  signal(SIGPIPE, SIG_IGN);
   http_server_t http_server;
   int port;
   if (argc == 1) {
@@ -35,7 +37,17 @@ int main(int argc, char **argv) {
   log_message(LOG_LEVEL_INFO, "main", "Starting...");
   init_http_server(&http_server, port);
   while (true) {
+    char *buffer = "<title>Hello world!</title><h1>Hello world</h1>";
     accept_http_request(&http_server);
+    if (!http_server.is_ok) {
+      continue;
+    }
+    send_http_head(&http_server, HTTP_STATUS_OK);
+    send_default_http_headers(&http_server);
+    send_http_header(&http_server, "Content-Type", "text/html");
+    send_http_end_headers(&http_server);
+    send_http_content(&http_server, buffer, strlen(buffer));
+    close_http_connection(&http_server);
   }
   return 0;
 }

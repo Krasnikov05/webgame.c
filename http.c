@@ -94,7 +94,7 @@ void send_http_content(http_server_t *http_server, char *buffer, int size) {
 void close_http_connection(http_server_t *http_server) {
   for (int i = 0; i < http_server->connected_client_count; i++) {
     if (http_server->pfds[i + 1].fd == http_server->client_fd) {
-      log_message(LOG_LEVEL_ERROR, "http", "Removing FD %d", http_server->client_fd);
+      log_message(LOG_LEVEL_INFO, "http", "Removing FD %d", http_server->client_fd);
       http_server->connected_client_count--;
       http_server->pfds[i + 1].fd = http_server->pfds[http_server->connected_client_count + 1].fd;
       break;
@@ -236,7 +236,6 @@ void parse_request(http_server_t *http_server) {
     }
   }
   http_server->is_ok = true;
-  send_simple_http_error(http_server, HTTP_STATUS_OK);
 }
 
 void accept_http_request(http_server_t *http_server) {
