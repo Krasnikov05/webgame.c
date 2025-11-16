@@ -1,3 +1,4 @@
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +24,7 @@ void print_usage(char *name) {
 
 int main(int argc, char **argv) {
   signal(SIGPIPE, SIG_IGN);
+  srand(time(NULL));
   http_server_t http_server;
   buffered_writer_t buffered_writer;
   json_writer_t json_writer;
