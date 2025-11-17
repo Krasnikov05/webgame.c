@@ -56,6 +56,7 @@ bool validate_username(char *username) {
       case 'a'...'z':
       case '0'...'9':
       case '_':
+        c++;
         continue;
       default:
         log_message(LOG_LEVEL_ERROR, "sessions", "Invalid character in username");
@@ -90,13 +91,51 @@ session_t *new_session(session_manager_t *session_manager, char *username) {
   return NULL;
 }
 
-void session_find_game(session_manager_t *session_manager, int session_id, game_type_t game_type);
+session_t *find_session_by_id(session_manager_t *session_manager, int id) {
+  clean_sessions(session_manager);
+  session_t *session;
+  for (int i = 0; i < MAX_SESSION_COUNT; i++) {
+    session = &session_manager->sessions[i];
+    if (!session->is_active) {
+      continue;
+    }
+    if (session->id == id) {
+      return session;
+    }
+  }
+  return NULL;
+}
+
+void session_find_game(session_manager_t *session_manager, session_t *session, game_type_t game_type) {
+  game_session_t *game_session;
+  for (int i = 0; i < MAX_GAME_SESSION_COUNT; i++) {
+    game_session = &session_manager->game_sessions[i];
+    if (game_session->is_active || game_session->game_type != game_type) {
+      continue;
+    }
+    for (int j = 0; j < MAX_PLAYERS_PER_GAME; j++) {
+      if (game_session->players[j] == NULL) {
+        session->game_session = game_session;
+        session->player_index = j;
+        update_session(session);
+        game_session->players[j] = session;
+        return;
+      }
+    }
+  }
+}
 
 void clean_sessions(session_manager_t *session_manager) {
+  session_t *session;
   time_t now = time(NULL);
   for (int i = 0; i < MAX_SESSION_COUNT; i++) {
-    if (now - session_manager->sessions[i].last_active > MAX_SESSION_INACTIVE_TIME) {
-      reset_session(&session_manager->sessions[i]);
+    session = &session_manager->sessions[i];
+    if (!session->is_active) {
+      continue;
+    }
+    if (now - session->last_active > MAX_SESSION_INACTIVE_TIME) {
+      log_message(LOG_LEVEL_INFO, "sessions", "Cleaning session #%d", session->id);
+      reset_session(session);
     }
   }  
 }

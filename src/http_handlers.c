@@ -5,6 +5,8 @@
 #include "http_handlers.h"
 #include "http.h"
 #include "log.h"
+#include "json_writer.h"
+#include "sessions.h"
 
 void init_static_handler(static_handler_t *static_handler) {
   DIR *d = opendir(STATIC_FILES_DIRECTORY);
@@ -118,4 +120,50 @@ void send_static_file(static_handler_t *static_handler, http_server_t *http_serv
 void handle_static_request(static_handler_t *static_handler, http_server_t *http_server) {
   char *name = http_server->path + strlen(STATIC_PATH_PREFIX);
   send_static_file(static_handler, http_server, name);
+}
+
+void handle_session_list_request(session_manager_t *session_manager, json_writer_t *json_writer) {
+  clean_sessions(session_manager);
+  json_start(json_writer);
+  json_start_array(json_writer);
+  session_t *session;
+  for (int i = 0; i < MAX_SESSION_COUNT; i++) {
+    session = &session_manager->sessions[i];
+    if (!session->is_active) {
+      continue;
+    }
+    json_start_dict(json_writer);
+    json_write_key(json_writer, "id");
+    json_write_number(json_writer, session->id);
+    json_write_key(json_writer, "name");
+    json_write_string(json_writer, session->username);
+    json_stop_dict(json_writer);
+  }
+  json_stop_array(json_writer);
+  json_end(json_writer);
+}
+
+void handle_auth_request(
+  http_server_t *http_server,
+  session_manager_t *session_manager,
+  static_handler_t *static_handler
+) {
+  char *username = get_http_parameter(http_server, "username");
+  if (username == NULL) {
+    send_static_file(static_handler, http_server, "auth.html");
+    return;
+  }
+  if (!validate_username(username)) {
+    send_simple_http_error(http_server, HTTP_STATUS_BAD_REQUEST);
+    return;
+  }
+  session_t *session = new_session(session_manager, username);
+  if (session == NULL) {
+    send_simple_http_error(http_server, HTTP_STATUS_INTERNAL_SERVER_ERROR);
+    return;
+  }
+  char path[256];
+  snprintf(path, sizeof(path), "/?id=%d", session->id);
+  send_http_redirect(http_server, path);
+  log_message(LOG_LEVEL_INFO, "http_handlers", "Created new session #%d '%s'", session->id, session->username);
 }

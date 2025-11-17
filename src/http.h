@@ -11,6 +11,7 @@
 #define HTTP_REQUEST_BUFFER_SIZE 4096
 #define HTTP_SERVER_RESPONSE_LINE_SIZE 512
 #define HTTP_STATUS_OK "200 OK"
+#define HTTP_STATUS_TEMPORARY_REDIRECT "307 Temporary Redirect"
 #define HTTP_STATUS_BAD_REQUEST "400 Bad Request"
 #define HTTP_STATUS_NOT_FOUND "404 Not Found"
 #define HTTP_STATUS_INTERNAL_SERVER_ERROR "500 Internal Server Error"
@@ -50,8 +51,12 @@ void send_http_content(http_server_t *http_server, char *buffer, int size);
 
 void send_simple_http_error(http_server_t *http_server, char *status);
 
+void send_http_redirect(http_server_t *http_server, char *path);
+
 void close_http_connection(http_server_t *http_server);
 
 void accept_http_request(http_server_t *http_server);
+
+char *get_http_parameter(http_server_t *http_server, char *key);
 
 #endif

@@ -115,6 +115,13 @@ void send_simple_http_error(http_server_t *http_server, char *status) {
   close_http_connection(http_server);
 }
 
+void send_http_redirect(http_server_t *http_server, char *path) {
+  send_http_head(http_server, HTTP_STATUS_TEMPORARY_REDIRECT);
+  send_http_header(http_server, "Location", path);
+  send_http_end_headers(http_server);
+  close_http_connection(http_server);
+}
+
 char read_url_hex(char *buffer) {
   char out = 0;
   for (int i = 1; i < 3; i++) {
@@ -278,4 +285,14 @@ void accept_http_request(http_server_t *http_server) {
       return;
     }
   }
+}
+
+char *get_http_parameter(http_server_t *http_server, char *key) {
+  parameter_list_entry_t *parameter = http_server->parameter_list;
+  while (parameter != NULL) {
+    if (strcmp(parameter->key, key) == 0) {
+      return parameter->value;
+    }
+  }
+  return NULL;
 }

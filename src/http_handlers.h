@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include "http.h"
+#include "json_writer.h"
+#include "sessions.h"
 
 #define STATIC_PATH_PREFIX "/static/"
 #define STATIC_FILES_DIRECTORY "./static/"
@@ -29,5 +31,13 @@ char *get_mime(char *path);
 void send_static_file(static_handler_t *static_handler, http_server_t *http_server, char *name);
 
 void handle_static_request(static_handler_t *static_handler, http_server_t *http_server);
+
+void handle_session_list_request(session_manager_t *session_manager, json_writer_t *json_writer);
+
+void handle_auth_request(
+  http_server_t *http_server,
+  session_manager_t *session_manager,
+  static_handler_t *static_handler
+);
 
 #endif
