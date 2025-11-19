@@ -12,6 +12,7 @@ typedef enum {
 
 typedef struct {
   int active_player_index;
+  int winner;
   tictactoe_cell_t cells[9];
 } tictactoe_game_t;
 

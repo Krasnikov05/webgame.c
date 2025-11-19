@@ -75,6 +75,10 @@ bool validate_username(char *username) {
     log_message(LOG_LEVEL_ERROR, "sessions", "Expected username got NULL");
     return false;
   }
+  if (strlen(username) == 0) {
+    log_message(LOG_LEVEL_ERROR, "sessions", "Empty username");
+    return false;
+  }
   if (strlen(username) > USERNAME_MAX_LENGTH) {
     log_message(LOG_LEVEL_ERROR, "sessions", "Username is too long");
     return false;
@@ -202,6 +206,13 @@ void end_game_session(game_session_t *game_session) {
     if (!game_session->player_seen_state[i]) {
       return;
     }
+  }
+  for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
+    session_t *session = game_session->players[i];
+    if (session == NULL) {
+      continue;
+    }
+    session->game_session = NULL;
   }
   reset_game_session(game_session);
 }

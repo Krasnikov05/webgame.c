@@ -236,7 +236,13 @@ void handle_game_request(http_server_t *http_server, session_t *session, json_wr
         tictactoe_write_json(session->game_session, json_writer);
         break;
     }
+    if (session->game_session->is_finished) {
+      end_game_session(session->game_session);
+    }
   }
   json_stop_dict(json_writer);
   json_end(json_writer);
+  if (session->game_session != NULL) {
+    session->game_session->player_seen_state[session->player_index] = true;
+  }
 }
