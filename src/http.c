@@ -293,6 +293,7 @@ char *get_http_parameter(http_server_t *http_server, char *key) {
     if (strcmp(parameter->key, key) == 0) {
       return parameter->value;
     }
+    parameter = parameter->next;
   }
   return NULL;
 }

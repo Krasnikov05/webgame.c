@@ -31,6 +31,8 @@ void json_write_string(json_writer_t *json_writer, char *string);
 
 void json_write_key(json_writer_t *json_writer, char *key);
 
+void json_write_null(json_writer_t *json_writer);
+
 void json_start(json_writer_t *json_writer);
 
 void json_end(json_writer_t *json_writer);

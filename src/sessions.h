@@ -17,6 +17,7 @@ typedef enum {
 
 typedef struct {
   bool is_active;
+  bool is_finished;
   void *players[MAX_PLAYERS_PER_GAME];
   bool player_seen_state[MAX_PLAYERS_PER_GAME];
   game_type_t game_type;
@@ -37,6 +38,10 @@ typedef struct {
   session_t *sessions;
 } session_manager_t;
 
+char *game_type_to_str(game_type_t game_type);
+
+game_type_t str_to_game_type(char *string);
+
 void init_session_manager(session_manager_t *session_manager);
 
 bool validate_username(char *username);
@@ -50,5 +55,11 @@ session_t *find_session_by_id(session_manager_t *session_manager, int id);
 void session_find_game(session_manager_t *session_manager, session_t *session, game_type_t game_type);
 
 void clean_sessions(session_manager_t *session_manager);
+
+void disconnect_from_game_session(session_t *session);
+
+void end_game_session(game_session_t *game_session);
+
+void try_start_game_session(game_session_t *game_session);
 
 #endif

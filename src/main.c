@@ -67,13 +67,25 @@ int main(int argc, char **argv) {
       handle_auth_request(&http_server, &session_manager, &static_handler);
       continue;
     }
-    char *id_str = get_http_parameter(&http_server, "id");
-    if (id_str == NULL) {
+    session_t *session = get_session_from_parameter(&http_server, &session_manager);
+    if (session == NULL) {
       send_http_redirect(&http_server, "/auth");
       continue;
     }
     if (strcmp(http_server.path, "/") == 0) {
       send_static_file(&static_handler, &http_server, "index.html");
+      continue;
+    }
+    if (strcmp(http_server.path, "/joinGame") == 0) {
+      handle_join_game(&http_server, &session_manager, session);
+      continue;
+    }
+    if (strcmp(http_server.path, "/game") == 0) {
+      send_static_file(&static_handler, &http_server, "game.html");
+      continue;
+    }
+    if (strcmp(http_server.path, "/gameRequest") == 0) {
+      handle_game_request(&http_server, session, &json_writer);
       continue;
     }
     send_simple_http_error(&http_server, HTTP_STATUS_NOT_FOUND);

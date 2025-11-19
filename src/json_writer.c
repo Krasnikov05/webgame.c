@@ -109,6 +109,15 @@ void json_write_key(json_writer_t *json_writer, char *key) {
   buffered_writer_write(json_writer->buffered_writer, ":", 1);
 }
 
+void json_write_null(json_writer_t *json_writer) {
+  if (!json_writer->is_first) {
+    buffered_writer_write(json_writer->buffered_writer, ",", 1);
+  }
+  json_writer->is_first = false;
+  char *buffer = "null";
+  buffered_writer_write(json_writer->buffered_writer, buffer, strlen(buffer));
+}
+
 void json_start(json_writer_t *json_writer) {
   json_writer->is_first = true;
   send_http_head(json_writer->http_server, HTTP_STATUS_OK);

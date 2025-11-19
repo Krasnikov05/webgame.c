@@ -4,17 +4,47 @@
 #include <stdbool.h>
 #include "sessions.h"
 #include "log.h"
+#include "tictactoe.h"
+
+char *game_type_to_str(game_type_t game_type) {
+  switch (game_type) {
+    case GAME_TYPE_EMPTY:
+      return NULL;
+    case GAME_TYPE_TICTACTOE:
+      return "tictactoe";
+  }
+  return NULL;
+}
+
+game_type_t str_to_game_type(char *string) {
+  if (strcmp(string, "tictactoe") == 0) {
+    return GAME_TYPE_TICTACTOE;
+  }
+  return GAME_TYPE_EMPTY;
+}
 
 void reset_game_session(game_session_t *game_session) {
   game_session->is_active = false;
-  game_session->game_type = GAME_TYPE_EMPTY;
+  game_session->is_finished = false;
   for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
     game_session->players[i] = NULL;
+    game_session->player_seen_state[i] = false;
   }
+  if (game_session->game != NULL) {
+    switch (game_session->game_type) {
+      case GAME_TYPE_EMPTY:
+        break;
+      case GAME_TYPE_TICTACTOE:
+        tictactoe_deinit(game_session);
+        break;
+    }
+  }
+  game_session->game_type = GAME_TYPE_EMPTY;
   game_session->game = NULL;
 }
 
 void reset_session(session_t *session) {
+  disconnect_from_game_session(session);
   session->is_active = false;
   if (session->game_session == NULL || !session->game_session->is_active) {
     return;
@@ -107,18 +137,24 @@ session_t *find_session_by_id(session_manager_t *session_manager, int id) {
 }
 
 void session_find_game(session_manager_t *session_manager, session_t *session, game_type_t game_type) {
+  update_session(session);
+  disconnect_from_game_session(session);
   game_session_t *game_session;
   for (int i = 0; i < MAX_GAME_SESSION_COUNT; i++) {
     game_session = &session_manager->game_sessions[i];
-    if (game_session->is_active || game_session->game_type != game_type) {
+    if (
+      game_session->is_active ||
+      (game_session->game_type != game_type && game_session->game_type != GAME_TYPE_EMPTY)
+    ) {
       continue;
     }
     for (int j = 0; j < MAX_PLAYERS_PER_GAME; j++) {
       if (game_session->players[j] == NULL) {
         session->game_session = game_session;
         session->player_index = j;
-        update_session(session);
         game_session->players[j] = session;
+        game_session->game_type = game_type;
+        try_start_game_session(game_session);
         return;
       }
     }
@@ -138,4 +174,51 @@ void clean_sessions(session_manager_t *session_manager) {
       reset_session(session);
     }
   }  
+}
+
+void disconnect_from_game_session(session_t *session) {
+  if (session->game_session == NULL) {
+    return;
+  }
+  session->game_session->players[session->player_index] = NULL;
+  end_game_session(session->game_session);
+  session->game_session = NULL;
+}
+
+void end_game_session(game_session_t *game_session) {
+  if (!game_session->is_active) {
+    return;
+  }
+  if (!game_session->is_finished) {
+    for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
+      game_session->player_seen_state[i] = false;
+    }
+  }
+  game_session->is_finished = true;
+  for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
+    if (game_session->players[i] == NULL) {
+      continue;
+    }
+    if (!game_session->player_seen_state[i]) {
+      return;
+    }
+  }
+  reset_game_session(game_session);
+}
+
+void try_start_game_session(game_session_t *game_session) {
+  for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
+    if (game_session->players[i] == NULL) {
+      return;
+    }
+  }
+  game_session->is_active = true;
+  switch (game_session->game_type) {
+    case GAME_TYPE_EMPTY:
+      log_message(LOG_LEVEL_ERROR, "sessions", "Attempting to start GAME_TYPE_EMPTY");
+      break;
+    case GAME_TYPE_TICTACTOE:
+      tictactoe_init(game_session);
+      break;
+  }
 }

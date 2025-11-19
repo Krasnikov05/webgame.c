@@ -33,6 +33,21 @@ input {
   border-style: solid;
 }
 
+.game-selector {
+  text-align: center;
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: calc(50vh - 100px);
+}
+
+.game-selector * {
+  display: block;
+  margin: 15px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 button {
   background-color: var(--primary-color);
   color: #fff;

@@ -40,4 +40,10 @@ void handle_auth_request(
   static_handler_t *static_handler
 );
 
+session_t *get_session_from_parameter(http_server_t *http_server, session_manager_t *session_manager);
+
+void handle_join_game(http_server_t *http_server, session_manager_t *session_manager, session_t *session);
+
+void handle_game_request(http_server_t *http_server, session_t *session, json_writer_t *json_writer);
+
 #endif

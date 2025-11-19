@@ -7,6 +7,7 @@
 #include "log.h"
 #include "json_writer.h"
 #include "sessions.h"
+#include "tictactoe.h"
 
 void init_static_handler(static_handler_t *static_handler) {
   DIR *d = opendir(STATIC_FILES_DIRECTORY);
@@ -57,27 +58,27 @@ void init_static_handler(static_handler_t *static_handler) {
 }
 
 bool starts_with(char *string, char *prefix) {
-    if (string == NULL || prefix == NULL) {
-      return false;
-    }
-    int len_string = strlen(string);
-    int len_prefix = strlen(prefix);
-    if (len_prefix > len_string) {
-      return false;
-    }
-    return strncmp(string, prefix, len_prefix) == 0;
+  if (string == NULL || prefix == NULL) {
+    return false;
+  }
+  int len_string = strlen(string);
+  int len_prefix = strlen(prefix);
+  if (len_prefix > len_string) {
+    return false;
+  }
+  return strncmp(string, prefix, len_prefix) == 0;
 }
 
 bool ends_with(char *string, char *suffix) {
-    if (string == NULL || suffix == NULL) {
-      return false;
-    }
-    int len_string = strlen(string);
-    int len_suffix = strlen(suffix);
-    if (len_suffix > len_string) {
-      return false;
-    }
-    return strncmp(string + (len_string - len_suffix), suffix, len_suffix) == 0;
+  if (string == NULL || suffix == NULL) {
+    return false;
+  }
+  int len_string = strlen(string);
+  int len_suffix = strlen(suffix);
+  if (len_suffix > len_string) {
+    return false;
+  }
+  return strncmp(string + (len_string - len_suffix), suffix, len_suffix) == 0;
 }
 
 bool match_static_path(http_server_t *http_server) {
@@ -137,6 +138,19 @@ void handle_session_list_request(session_manager_t *session_manager, json_writer
     json_write_number(json_writer, session->id);
     json_write_key(json_writer, "name");
     json_write_string(json_writer, session->username);
+    json_write_key(json_writer, "player_index");
+    json_write_number(json_writer, session->player_index);
+    json_write_key(json_writer, "game_session");
+    if (session->game_session == NULL) {
+      json_write_null(json_writer);
+    } else {
+      json_start_dict(json_writer);
+      json_write_key(json_writer, "is_active");
+      json_write_bool(json_writer, session->game_session->is_active);
+      json_write_key(json_writer, "game_type");
+      json_write_number(json_writer, session->game_session->game_type);
+      json_stop_dict(json_writer);
+    }
     json_stop_dict(json_writer);
   }
   json_stop_array(json_writer);
@@ -166,4 +180,63 @@ void handle_auth_request(
   snprintf(path, sizeof(path), "/?id=%d", session->id);
   send_http_redirect(http_server, path);
   log_message(LOG_LEVEL_INFO, "http_handlers", "Created new session #%d '%s'", session->id, session->username);
+}
+
+session_t *get_session_from_parameter(http_server_t *http_server, session_manager_t *session_manager) {
+  char *session_id_str = get_http_parameter(http_server, "id");
+  if (session_id_str == NULL) {
+    return NULL;
+  }
+  int session_id = atoi(session_id_str);
+  return find_session_by_id(session_manager, session_id);
+}
+
+void handle_join_game(http_server_t *http_server, session_manager_t *session_manager, session_t *session) {
+  char *game_id_str = get_http_parameter(http_server, "gameId");
+  if (game_id_str == NULL) {
+    send_simple_http_error(http_server, HTTP_STATUS_BAD_REQUEST);
+    return;
+  }
+  game_type_t game_type = str_to_game_type(game_id_str);
+  if (game_type == GAME_TYPE_EMPTY) {
+    send_simple_http_error(http_server, HTTP_STATUS_BAD_REQUEST);
+    return;
+  }
+  session_find_game(session_manager, session, game_type);
+  char path[256];
+  snprintf(path, sizeof(path), "/game?id=%d&gameType=%s", session->id, game_type_to_str(game_type));
+  send_http_redirect(http_server, path);
+}
+
+void handle_game_request(http_server_t *http_server, session_t *session, json_writer_t *json_writer) {
+  update_session(session);
+  char *status;
+  if (session->game_session == NULL) {
+    log_message(LOG_LEVEL_INFO, "http_handlers", "Trying to handle_game_request without game_session");
+    status = "no_game_session";
+  } else if (!session->game_session->is_active) {
+    status = "game_not_started";
+  } else if (session->game_session->is_finished) {
+    status = "game_finished";
+  } else {
+    status = "game_active";
+  }
+  json_start(json_writer);
+  json_start_dict(json_writer);
+  json_write_key(json_writer, "status");
+  json_write_string(json_writer, status);
+  if (session->game_session != NULL && session->game_session->game != NULL) {
+    json_write_key(json_writer, "state");
+    switch (session->game_session->game_type) {
+      case GAME_TYPE_EMPTY:
+        json_write_null(json_writer);
+        break;
+      case GAME_TYPE_TICTACTOE:
+        tictactoe_handle_request(session->game_session, session, http_server);
+        tictactoe_write_json(session->game_session, json_writer);
+        break;
+    }
+  }
+  json_stop_dict(json_writer);
+  json_end(json_writer);
 }

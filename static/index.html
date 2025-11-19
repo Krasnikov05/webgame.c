@@ -5,11 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/style.css">
-  <title>Document</title>
+  <title>Choose game!</title>
+  <script>
+    function joinGame(gameId) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("gameId", gameId);
+      const newUrl = "/joinGame?" + params.toString();
+      window.open(newUrl, "_self");
+    }
+  </script>
 </head>
 
 <body>
-  <h1>Hello world!</h1>
+  <div class="game-selector">
+    <strong>Choose game!</strong>
+    <button onclick="joinGame('tictactoe')">TicTacToe</button>
+  </div>
 </body>
 
 </html>
