@@ -95,6 +95,9 @@ char *get_mime(char *path) {
   if (ends_with(path, ".css")) {
     return "text/css";
   }
+  if (ends_with(path, ".svg")) {
+    return "image/svg+xml";
+  }
   return "text/plain";
 }
 
@@ -168,7 +171,7 @@ void handle_auth_request(
     return;
   }
   if (!validate_username(username)) {
-    send_simple_http_error(http_server, HTTP_STATUS_BAD_REQUEST);
+    send_http_redirect(http_server, "/auth?msg=Invalid%20username");
     return;
   }
   session_t *session = new_session(session_manager, username);

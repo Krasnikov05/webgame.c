@@ -5,11 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
   <title>Authentication</title>
 </head>
 
-<body>
-  <div class="login-box">
+<body id="auth-body">
+  <canvas id="background-canv"></canvas>
+  <div class="login-box card">
+    <img src="/static/icon.svg" alt="">
+    <h1>TicTacToe</h1>
+    <div style="display: none" id="error-box" class="error-box">
+      ERROR:
+      <span id="error-message">msg</span>
+    </div>
     <form action="/auth" method="GET">
       <label for="username">Username:</label>
       <br>
@@ -18,6 +26,17 @@
       <button type="submit">Connect</button>
     </form>
   </div>
+  <script src="/static/auth-background.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const message = params.get("msg");
+    if (message != null) {
+      const errorBox = document.getElementById("error-box");
+      const errorMsg = document.getElementById("error-message");
+      errorBox.style = {};
+      errorMsg.innerText = message;
+    }
+  </script>
 </body>
 
 </html>
