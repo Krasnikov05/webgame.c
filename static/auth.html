@@ -14,7 +14,7 @@
   <div class="login-box card">
     <img src="/static/icon.svg" alt="icon">
     <h1>TicTacToe</h1>
-    <div style="display: none" id="error-box" class="error-box">
+    <div id="error-box" class="error-box hidden">
       ERROR:
       <span id="error-message">msg</span>
     </div>
@@ -33,7 +33,7 @@
     if (message != null) {
       const errorBox = document.getElementById("error-box");
       const errorMsg = document.getElementById("error-message");
-      errorBox.style = {};
+      errorBox.classList.remove("hidden");
       errorMsg.innerText = message;
     }
   </script>

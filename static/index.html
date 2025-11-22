@@ -7,17 +7,6 @@
   <link rel="stylesheet" href="/static/style.css">
   <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
   <title>Choose game!</title>
-  <script>
-    function followLink(link) {
-      window.open(link + window.location.search, "_self");
-    }
-    function joinGame(gameId) {
-      const params = new URLSearchParams(window.location.search);
-      params.set("gameId", gameId);
-      const newUrl = "/joinGame?" + params.toString();
-      window.open(newUrl, "_self");
-    }
-  </script>
 </head>
 
 <body>
@@ -33,8 +22,14 @@
       </div>
     </div>
   </div>
+  <div class="modal-bg hidden modal-hidden" id="modal-bg">
+    <img src="/static/close-button.svg" alt="close button" class="modal-close-button" onclick="hideModal()">
+    <div class="card modal modal-guide hidden modal-hidden" id="modal-guide">
+      <iframe id="iframe" frameborder="0"></iframe>
+    </div>
+  </div>
   <div class="container article">
-    <h2>Choose game!</h2>
+    <h2 style="text-align: center;">Choose game!</h2>
     <div class="game-cards">
       <div class="game-card card">
         <div class="line-1">
@@ -44,10 +39,16 @@
             <p>Classic version of the game.</p>
           </div>
         </div>
-        <button onclick="joinGame('tictactoe')">Play!</button>
+        <div class="buttons">
+          <button class="secondary-button" onclick="showModalGuide('/static/tictactoe-guide.html')">
+            Rules
+          </button>
+          <button onclick="joinGame('tictactoe')">Play!</button>
+        </div>
       </div>
     </div>
   </div>
+  <script src="/static/pages-general.js"></script>
 </body>
 
 </html>
