@@ -8,6 +8,9 @@
   <link rel="icon" href="/static/icon.svg" type="image/svg+xml">
   <title>Choose game!</title>
   <script>
+    function followLink(link) {
+      window.open(link + window.location.search, "_self");
+    }
     function joinGame(gameId) {
       const params = new URLSearchParams(window.location.search);
       params.set("gameId", gameId);
@@ -18,9 +21,32 @@
 </head>
 
 <body>
-  <div class="game-selector card">
-    <strong>Choose game!</strong>
-    <button onclick="joinGame('tictactoe')">TicTacToe</button>
+  <div class="header">
+    <div class="container">
+      <div class="logo">
+        <img src="/static/icon.svg" alt="icon">
+        <h1>TicTacToe</h1>
+      </div>
+      <div class="entries">
+        <a onclick="followLink('/')">Games</a>
+        <a onclick="followLink('/leaderboard')">Leaderboard</a>
+      </div>
+    </div>
+  </div>
+  <div class="container article">
+    <h2>Choose game!</h2>
+    <div class="game-cards">
+      <div class="game-card card">
+        <div class="line-1">
+          <img src="/static/tictactoe-pic.svg" alt="TicTacToe">
+          <div class="description">
+            <h3>TicTacToe</h3>
+            <p>Classic version of the game.</p>
+          </div>
+        </div>
+        <button onclick="joinGame('tictactoe')">Play!</button>
+      </div>
+    </div>
   </div>
 </body>
 

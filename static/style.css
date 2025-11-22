@@ -34,6 +34,63 @@
   background-color: #fff;
 }
 
+.header {
+  display: block;
+  background-color: white;
+  height: 64px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+
+.header .container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.header .entries {
+  display: flex;
+  flex-direction: row;
+}
+
+.header .entries a {
+  margin: 15px;
+  cursor: pointer;
+  transition: color 0.4s;
+}
+
+.header .entries a:hover {
+  color: var(--primary-color);
+}
+
+.logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.logo img {
+  margin-left: 15px;
+  width: 35px;
+}
+
+.logo h1 {
+  font-size: 25px;
+}
+
+.article>* {
+  margin-top: 15px;
+}
+
 .login-box {
   text-align: center;
   width: 300px;
@@ -74,19 +131,35 @@ input:focus-visible {
   border-color: var(--primary-color);
 }
 
-.game-selector {
-  text-align: center;
-  width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: calc(50vh - 100px);
+.game-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
-.game-selector * {
-  display: block;
-  margin: 15px;
-  margin-left: auto;
-  margin-right: auto;
+.game-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.game-card img {
+  width: 128px;
+}
+
+.game-card .line-1 {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-card .description {
+  padding: 10px;
+}
+
+.game-card .description * {
+  margin-top: 5px;
 }
 
 .game-box {
@@ -107,6 +180,7 @@ button {
   padding: 15px 25px;
   border-radius: 25px;
   transition: opacity 0.4s, transform 0.4s;
+  cursor: pointer;
 }
 
 button:hover {
