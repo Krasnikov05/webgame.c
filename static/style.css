@@ -242,7 +242,7 @@ input:focus-visible {
 
 .game-box {
   text-align: center;
-  margin-top: calc(50vh - 150px);
+  margin-top: calc(50vh - 150px - 64px);
 }
 
 .game-box * {

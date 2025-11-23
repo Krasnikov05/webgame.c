@@ -1,0 +1,108 @@
+const COLORS = {
+  cross: "#E94138",
+  circle: "#FFB520",
+  outline: "#B8B8D1",
+};
+const ANIMATION_STEP = 0.1;
+const canv = document.getElementById("canv");
+const ctx = canv.getContext("2d");
+const statusDiv = document.getElementById("status");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+let state = { active_player_index: 0, cells: Array.from({length: 9}).map((_) => " ") };
+
+class Sprite {
+  constructor(type) {
+    this.type = type;
+    this.progress = 0;
+  }
+
+  update() {
+    this.progress += ANIMATION_STEP;
+  }
+}
+
+class Drawer {
+  constructor(canv, ctx, statusDiv) {
+    this.canv = canv;
+    this.ctx = ctx;
+    this.statusDiv = statusDiv;
+    this.cells = Array.from({length: 9}).map((_) => " ");
+    this.sprites = Array.from({length: 9}).map((_) => null);
+  }
+
+  update(cells) {
+    this.cells = cells;
+  }
+
+  drawGrid(n) {
+    const cellWidth = this.canv.width / n;
+    for (let i = 0; i < n; i++) {
+      this.ctx.strokeStyle = "rgb(0, 0, 0)";
+      this.ctx.lineWidth = 5.0;
+      this.ctx.beginPath();
+      this.ctx.moveTo(i * cellWidth, 0);
+      this.ctx.moveTo(i * cellWidth, n * cellWidth);
+      this.ctx.stroke();
+      this.ctx.beginPath();
+      this.ctx.moveTo(0, i * cellWidth);
+      this.ctx.moveTo(n * cellWidth, i * cellWidth);
+      this.ctx.stroke();
+    }
+  }
+
+  draw() {
+    this.ctx.clearRect(0, 0, this.canv.width, this.canv.height);
+    this.ctx.strokeStyle = "rgb(0, 0, 0)";
+    this.ctx.lineWidth = 5.0;
+    this.ctx.font = "48px sans-serif"
+    this.ctx.textAlign = "center";
+    this.ctx.textBaseline = "middle";
+    this.drawGrid(3);
+    const cellWidth = this.canv.width / 3;
+    for (let i = 0; i < 9; i++) {
+      const x = (i % 3);
+      const y = Math.floor(i / 3);
+      ctx.fillText(this.cells[i], (x + 0.5) * cellWidth, (y + 0.5) * cellWidth);
+    }
+  }
+}
+
+const drawer = new Drawer(canv, ctx, statusDiv);
+
+function draw() {
+  drawer.draw();
+  requestAnimationFrame(draw);
+}
+
+draw();
+
+drawer.update(["X", " ", " ", " ", " ", " ", " ", " ", " "]);
+
+async function update(cell) {
+  console.log(cell);
+  let path = "/gameRequest?id=" + id;
+  if (cell != null) {
+    path += "&cell=" + cell
+  }
+  const response = await fetch(path);
+  if (!response.ok) {
+    return;
+  }
+  const result = await response.json();
+  console.log(result);
+  if (result.state) {
+    state = result.state;
+  }
+  statusDiv.innerText = result.status;
+  draw();
+}
+
+setInterval(() => update(), 500);
+
+canv.addEventListener("click", (e) => {
+  const x = Math.floor(3 * (e.clientX - canv.getBoundingClientRect().left) / canv.width);
+  const y = Math.floor(3 * (e.clientY - canv.getBoundingClientRect().top) / canv.height);
+  const cell = x + 3 * y;
+  update(cell);
+});

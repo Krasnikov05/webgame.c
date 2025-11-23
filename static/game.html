@@ -10,6 +10,24 @@
 </head>
 
 <body>
+  <div class="header">
+    <div class="container">
+      <div class="logo">
+        <img src="/static/icon.svg" alt="icon">
+        <h1>TicTacToe</h1>
+      </div>
+      <div class="entries">
+        <a onclick="followLink('/')">Games</a>
+        <a onclick="followLink('/leaderboard')">Leaderboard</a>
+      </div>
+    </div>
+  </div>
+  <div class="modal-bg hidden modal-hidden" id="modal-bg">
+    <img src="/static/close-button.svg" alt="close button" class="modal-close-button" onclick="hideModal()">
+    <div class="card modal modal-guide hidden modal-hidden" id="modal-guide">
+      <iframe id="iframe" frameborder="0"></iframe>
+    </div>
+  </div>
   <div class="game-box">
     <canvas id="canv" width="300" , height="300"></canvas>
     <div id="status"></div>
