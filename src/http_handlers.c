@@ -230,6 +230,19 @@ void handle_game_request(http_server_t *http_server, session_t *session, json_wr
   json_write_string(json_writer, status);
   json_write_key(json_writer, "your_index");
   json_write_number(json_writer, session->player_index);
+  json_write_key(json_writer, "player_names");
+  json_start_array(json_writer);
+  if (session->game_session != NULL) {
+    for (int i = 0; i < MAX_PLAYERS_PER_GAME; i++) {
+      session_t *isession = session->game_session->players[i];
+      if (isession == NULL) {
+        json_write_null(json_writer);
+      } else {
+        json_write_string(json_writer, isession->username);
+      }
+    }
+  }
+  json_stop_array(json_writer);
   if (session->game_session != NULL && session->game_session->game != NULL) {
     json_write_key(json_writer, "state");
     switch (session->game_session->game_type) {

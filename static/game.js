@@ -10,6 +10,7 @@ const statusDiv = document.getElementById("status");
 const modalExit = document.getElementById("modal-exit");
 const exitButton = document.getElementById("exit-button");
 const splashElem = document.getElementById("splash");
+const playersElem = document.getElementById("players");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const gameType = params.get("gameType");
@@ -61,11 +62,12 @@ class Sprite {
 }
 
 class Drawer {
-  constructor(canv, ctx, statusDiv, splashElem) {
+  constructor(canv, ctx, statusDiv, splashElem, playersElem) {
     this.canv = canv;
     this.ctx = ctx;
     this.statusDiv = statusDiv;
     this.splashElem = splashElem;
+    this.playersElem = playersElem;
     this.playerIndex = -1;
     this.cells = Array.from({ length: 9 }).map((_) => " ");
     this.sprites = Array.from({ length: 9 }).map((_) => null);
@@ -92,8 +94,17 @@ class Drawer {
     if (this.finished) {
       return;
     }
+    this.playersElem.innerHTML = response.player_names.map((x) => {
+      if (x == null) {
+        return "<div class='unknown'>???</div>";
+      }
+      return "<div>" + x + "</div>";
+    }).join("");
     const state = response.state;
     this.playerIndex = response.your_index;
+    if (response.status == "game_active") {
+      this.statusDiv.innerText = state.active_player_index == this.playerIndex ? "Your turn" : "";
+    }
     if (response.status == "game_finished") {
       this.finished = true;
       setTimeout(() => {
@@ -190,7 +201,7 @@ class Drawer {
   }
 }
 
-const drawer = new Drawer(canv, ctx, statusDiv, splashElem);
+const drawer = new Drawer(canv, ctx, statusDiv, splashElem, playersElem);
 
 function draw(time) {
   drawer.draw(time);
@@ -214,10 +225,11 @@ async function update(cell) {
   if (result.state) {
     state = result.state;
   }
-  statusDiv.innerText = result.status;
+  // statusDiv.innerText = result.status;
   drawer.update(result);
 }
 
+update();
 setInterval(() => update(), 500);
 
 canv.addEventListener("click", (e) => {

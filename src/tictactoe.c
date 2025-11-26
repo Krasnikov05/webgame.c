@@ -133,6 +133,9 @@ void tictactoe_handle_request(game_session_t *game_session, session_t *session, 
 }
 
 void tictactoe_handle_disconnect(game_session_t *game_session, session_t *session) {
+  if (game_session == NULL || game_session->game == NULL || session == NULL) {
+    return;
+  }
   tictactoe_game_t *game = game_session->game;
   game->winner = 1 - session->player_index;
 }

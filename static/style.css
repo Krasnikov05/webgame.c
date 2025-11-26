@@ -242,7 +242,7 @@ input:focus-visible {
 
 .game-box {
   text-align: center;
-  margin-top: calc(50vh - 150px - 64px);
+  margin-top: calc(50vh - 150px - 64px - 35px);
 }
 
 .game-box * {
@@ -280,7 +280,26 @@ button:hover {
 }
 
 .game-canvas {
-  margin-bottom: 35px;
+  margin-bottom: 10px;
+}
+
+#status {
+  height: 25px;
+  margin-bottom: 10px;
+}
+
+.players {
+  width: 300px;
+  height: 25px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.players div {
+  display: inline;
+  margin: 0px;
+  color: var(--outline);
 }
 
 .game-box .buttons {
