@@ -88,6 +88,10 @@ int main(int argc, char **argv) {
       handle_game_request(&http_server, session, &json_writer);
       continue;
     }
+    if (strcmp(http_server.path, "/disconnect") == 0) {
+      handle_disconnect_from_game_session(&http_server, session);
+      continue;
+    }
     send_simple_http_error(&http_server, HTTP_STATUS_NOT_FOUND);
   }
   return 0;

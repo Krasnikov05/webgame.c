@@ -15,7 +15,7 @@ function showModalGuide(url) {
 }
 function hideModal() {
   modalBg.classList.add("modal-hidden");
-  modalGuide.classList.add("modal-hidden");
+  Array.from(document.getElementsByClassName("modal")).map((x) => x.classList.add("modal-hidden"));
   setTimeout(
     () => {
       modalBg.classList.add("hidden");

@@ -7,9 +7,36 @@ const ANIMATION_STEP = 0.003;
 const canv = document.getElementById("canv");
 const ctx = canv.getContext("2d");
 const statusDiv = document.getElementById("status");
+const modalExit = document.getElementById("modal-exit");
+const exitButton = document.getElementById("exit-button");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
+const gameType = params.get("gameType");
 let state = { active_player_index: 0, cells: Array.from({ length: 9 }).map((_) => " ") };
+
+function showThisGuide() {
+  showModalGuide("/static/" + gameType + "-guide.html");
+}
+
+async function disconnectFollowLink(url) {
+  if (url == undefined) {
+    url = "/"
+  }
+  modalBg.classList.remove("hidden");
+  modalExit.classList.remove("hidden");
+  setTimeout(
+    () => {
+      modalBg.classList.remove("modal-hidden");
+      modalExit.classList.remove("modal-hidden");
+    },
+    20
+  );
+  exitButton.onclick = () => {
+    fetch("/disconnect?id=" + id).then(() =>
+      window.open(url + "?id=" + id, "_self")
+    )
+  };
+}
 
 function easingFunction(x) {
   if (x > 1) {

@@ -46,4 +46,6 @@ void handle_join_game(http_server_t *http_server, session_manager_t *session_man
 
 void handle_game_request(http_server_t *http_server, session_t *session, json_writer_t *json_writer);
 
+void handle_disconnect_from_game_session(http_server_t *http_server, session_t *session);
+
 #endif

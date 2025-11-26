@@ -17,8 +17,8 @@
         <h1>TicTacToe</h1>
       </div>
       <div class="entries">
-        <a onclick="followLink('/')">Games</a>
-        <a onclick="followLink('/leaderboard')">Leaderboard</a>
+        <a onclick="disconnectFollowLink('/')">Games</a>
+        <a onclick="disconnectFollowLink('/leaderboard')">Leaderboard</a>
       </div>
     </div>
   </div>
@@ -27,11 +27,20 @@
     <div class="card modal modal-guide hidden modal-hidden" id="modal-guide">
       <iframe id="iframe" frameborder="0"></iframe>
     </div>
+    <div class="card modal modal-exit hidden modal-hidden" id="modal-exit">
+      <p>Are you sure you want to exit?</p>
+      <button class="danger-button" id="exit-button">Exit</button>
+    </div>
   </div>
   <div class="game-box">
-    <canvas id="canv" width="300" , height="300"></canvas>
+    <canvas class="game-canvas" id="canv" width="300" , height="300"></canvas>
     <div id="status"></div>
+    <div class="buttons">
+      <button class="secondary-button" onclick="showThisGuide()">Rules</button>
+      <button class="danger-button" onclick="disconnectFollowLink()">Exit</button>
+    </div>
   </div>
+  <script src="/static/pages-general.js"></script>
   <script src="/static/game.js"></script>
 </body>
 

@@ -249,3 +249,10 @@ void handle_game_request(http_server_t *http_server, session_t *session, json_wr
     session->game_session->player_seen_state[session->player_index] = true;
   }
 }
+
+void handle_disconnect_from_game_session(http_server_t *http_server, session_t *session) {
+  disconnect_from_game_session(session);
+  char path[256];
+  snprintf(path, sizeof(path), "/?id=%d", session->id);
+  send_http_redirect(http_server, path);
+}
