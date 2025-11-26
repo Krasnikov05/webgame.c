@@ -11,6 +11,7 @@ const modalExit = document.getElementById("modal-exit");
 const exitButton = document.getElementById("exit-button");
 const splashElem = document.getElementById("splash");
 const playersElem = document.getElementById("players");
+const spinner = document.getElementById("spinner");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const gameType = params.get("gameType");
@@ -62,12 +63,13 @@ class Sprite {
 }
 
 class Drawer {
-  constructor(canv, ctx, statusDiv, splashElem, playersElem) {
+  constructor(canv, ctx, statusDiv, splashElem, playersElem, spinner) {
     this.canv = canv;
     this.ctx = ctx;
     this.statusDiv = statusDiv;
     this.splashElem = splashElem;
     this.playersElem = playersElem;
+    this.spinner = spinner;
     this.playerIndex = -1;
     this.cells = Array.from({ length: 9 }).map((_) => " ");
     this.sprites = Array.from({ length: 9 }).map((_) => null);
@@ -103,6 +105,7 @@ class Drawer {
     const state = response.state;
     this.playerIndex = response.your_index;
     if (response.status == "game_active") {
+      this.spinner.classList.add("hidden");
       this.statusDiv.innerText = state.active_player_index == this.playerIndex ? "Your turn" : "";
     }
     if (response.status == "game_finished") {
@@ -201,7 +204,7 @@ class Drawer {
   }
 }
 
-const drawer = new Drawer(canv, ctx, statusDiv, splashElem, playersElem);
+const drawer = new Drawer(canv, ctx, statusDiv, splashElem, playersElem, spinner);
 
 function draw(time) {
   drawer.draw(time);
