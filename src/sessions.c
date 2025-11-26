@@ -185,6 +185,13 @@ void disconnect_from_game_session(session_t *session) {
     return;
   }
   session->game_session->players[session->player_index] = NULL;
+  switch (session->game_session->game_type) {
+    case GAME_TYPE_EMPTY:
+      break;
+    case GAME_TYPE_TICTACTOE:
+      tictactoe_handle_disconnect(session->game_session, session);
+      break;
+  }
   end_game_session(session->game_session);
   session->game_session = NULL;
 }

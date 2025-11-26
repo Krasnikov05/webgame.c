@@ -32,6 +32,8 @@ void tictactoe_write_json(game_session_t *game_session, json_writer_t *json_writ
   json_start_dict(json_writer);
   json_write_key(json_writer, "active_player_index");
   json_write_number(json_writer, game->active_player_index);
+  json_write_key(json_writer, "winner_index");
+  json_write_number(json_writer, game->winner);
   json_write_key(json_writer, "cells");
   json_start_array(json_writer);
   for (int i = 0; i < 9; i++) {
@@ -128,4 +130,9 @@ void tictactoe_handle_request(game_session_t *game_session, session_t *session, 
   game->cells[cell] = session->player_index == 1 ? TICTACTOE_CELL_O : TICTACTOE_CELL_X;
   game->active_player_index = (game->active_player_index + 1) % 2;
   tictactoe_try_finish(game_session);
+}
+
+void tictactoe_handle_disconnect(game_session_t *game_session, session_t *session) {
+  tictactoe_game_t *game = game_session->game;
+  game->winner = 1 - session->player_index;
 }

@@ -228,6 +228,8 @@ void handle_game_request(http_server_t *http_server, session_t *session, json_wr
   json_start_dict(json_writer);
   json_write_key(json_writer, "status");
   json_write_string(json_writer, status);
+  json_write_key(json_writer, "your_index");
+  json_write_number(json_writer, session->player_index);
   if (session->game_session != NULL && session->game_session->game != NULL) {
     json_write_key(json_writer, "state");
     switch (session->game_session->game_type) {

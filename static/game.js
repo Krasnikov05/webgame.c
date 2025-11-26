@@ -9,6 +9,7 @@ const ctx = canv.getContext("2d");
 const statusDiv = document.getElementById("status");
 const modalExit = document.getElementById("modal-exit");
 const exitButton = document.getElementById("exit-button");
+const splashElem = document.getElementById("splash");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const gameType = params.get("gameType");
@@ -60,16 +61,53 @@ class Sprite {
 }
 
 class Drawer {
-  constructor(canv, ctx, statusDiv) {
+  constructor(canv, ctx, statusDiv, splashElem) {
     this.canv = canv;
     this.ctx = ctx;
     this.statusDiv = statusDiv;
+    this.splashElem = splashElem;
+    this.playerIndex = -1;
     this.cells = Array.from({ length: 9 }).map((_) => " ");
     this.sprites = Array.from({ length: 9 }).map((_) => null);
     this.lastTime = null;
+    this.finished = false;
   }
 
-  update(cells) {
+  splash(text) {
+    this.splashElem.innerText = text;
+    this.splashElem.classList.remove("hidden");
+    const keyframes = [
+      { transform: 'scale(0)' },
+      { transform: 'scale(1)' },
+    ];
+    const options = {
+      duration: 300,
+      easing: "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+      iterations: 1,
+    };
+    this.splashElem.animate(keyframes, options);
+  }
+
+  update(response) {
+    if (this.finished) {
+      return;
+    }
+    const state = response.state;
+    this.playerIndex = response.your_index;
+    if (response.status == "game_finished") {
+      this.finished = true;
+      setTimeout(() => {
+        window.open("/?id=" + id, "_self")
+      }, 2000);
+      if (state.winner_index == this.playerIndex) {
+        this.splash("You win!");
+      } else if (state.winner_index == 1 - this.playerIndex) {
+        this.splash("You lost!");
+      } else {
+        this.splash("Draw!");
+      }
+    }
+    const cells = state.cells;
     for (let i = 0; i < 9; i++) {
       if (cells[i] != this.cells[i]) {
         this.sprites[i] = new Sprite(cells[i]);
@@ -152,7 +190,7 @@ class Drawer {
   }
 }
 
-const drawer = new Drawer(canv, ctx, statusDiv);
+const drawer = new Drawer(canv, ctx, statusDiv, splashElem);
 
 function draw(time) {
   drawer.draw(time);
@@ -177,7 +215,7 @@ async function update(cell) {
     state = result.state;
   }
   statusDiv.innerText = result.status;
-  drawer.update(state.cells);
+  drawer.update(result);
 }
 
 setInterval(() => update(), 500);

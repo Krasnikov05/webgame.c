@@ -309,3 +309,12 @@ button:hover {
   margin-left: auto;
   margin-right: auto;
 }
+
+.splash {
+  position: absolute;
+  text-align: center;
+  top: calc(50vh - 15px);
+  width: 100%;
+  font-size: 30px;
+  font-weight: bold;
+}

@@ -24,4 +24,6 @@ void tictactoe_write_json(game_session_t *game_session, json_writer_t *json_writ
 
 void tictactoe_handle_request(game_session_t *game_session, session_t *session, http_server_t *http_server);
 
+void tictactoe_handle_disconnect(game_session_t *game_session, session_t *session);
+
 #endif
