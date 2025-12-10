@@ -130,9 +130,8 @@ void handle_session_list_request(session_manager_t *session_manager, json_writer
   clean_sessions(session_manager);
   json_start(json_writer);
   json_start_array(json_writer);
-  session_t *session;
-  for (int i = 0; i < MAX_SESSION_COUNT; i++) {
-    session = &session_manager->sessions[i];
+  session_t *session = session_manager->sessions;
+  while(session != NULL) {
     if (!session->is_active) {
       continue;
     }
@@ -155,6 +154,7 @@ void handle_session_list_request(session_manager_t *session_manager, json_writer
       json_stop_dict(json_writer);
     }
     json_stop_dict(json_writer);
+    session = session->next_session;
   }
   json_stop_array(json_writer);
   json_end(json_writer);

@@ -6,8 +6,6 @@
 
 #define USERNAME_MAX_LENGTH 256
 #define MAX_PLAYERS_PER_GAME 2
-#define MAX_SESSION_COUNT 16
-#define MAX_GAME_SESSION_COUNT 8
 #define MAX_SESSION_INACTIVE_TIME 300
 
 typedef enum {
@@ -22,6 +20,8 @@ typedef struct {
   bool player_seen_state[MAX_PLAYERS_PER_GAME];
   game_type_t game_type;
   void *game;
+  bool removable;
+  void *next_game_session;
 } game_session_t;
 
 typedef struct {
@@ -31,6 +31,7 @@ typedef struct {
   game_session_t *game_session;
   int player_index;
   time_t last_active;
+  void *next_session;
 } session_t;
 
 typedef struct {
